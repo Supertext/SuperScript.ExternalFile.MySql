@@ -11,7 +11,7 @@ This is the functionality offered by SuperScript.
 
 
 
-##A Storage Implementation for `SuperScript.ExternalFile`
+###A Storage Implementation for `SuperScript.ExternalFile`
 
 The [documentation](https://github.com/Supertext/SuperScript.ExternalFile/blob/master/README.md#relocate-assets-into-a-separate-file) 
 for `SuperScript.ExternalFile` explains the whys and wherefores of relocating assets to a separate file.
