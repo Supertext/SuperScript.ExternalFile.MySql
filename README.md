@@ -30,7 +30,7 @@ This project simply offers the means of utilising MySQL as the underlying store.
   ```XML
   <superScript.ExternalFile>
     <storage type="SuperScript.ExternalFile.Storage.DbStore, SuperScript.ExternalFile">
-    		<dbProvider connectionStringName="myConnString" type="SuperScript.ExternalFile.MySql.MySqStoreProvider, SuperScript.ExternalFile.MySql" />
+    		<dbProvider connectionStringName="myConnString" type="SuperScript.ExternalFile.MySql.MySqlStoreProvider, SuperScript.ExternalFile.MySql" />
     </storage>
   </superScript.ExternalFile>
   ```
