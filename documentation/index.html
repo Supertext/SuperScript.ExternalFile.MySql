@@ -1,0 +1,226 @@
+<h2>What Does It Do?</h2>
+
+<p>
+	This library is an add-on for <a href="https://github.com/Supertext/SuperScript.Common/" target="_blank">SuperScript</a>. It is strongly recommended
+	to read the <a href="http://supertext.github.io/SuperScript.Common/" target="_blank">documentation</a> for the core project before proceeding with this 
+	library. If you haven't yet read the core documentation then it is recommended that you start by reading about the 
+	<a href="http://supertext.github.io/SuperScript.Common/#!/core-concepts" target="_blank">core concepts</a>.
+</p>
+
+<p>
+  Furthermore, as this assembly builds on top of the SuperScript.ExternalFile assembly, it is assumed that you have read the
+  documentation for SuperScript.ExternalFile which can be found <a href="http://supertext.github.io/SuperScript.ExternalFile/" target="_blank">here</a>.
+</p>
+
+<p>
+	Where SuperScript.ExternalFile adds functionality 
+	for emitting entities in external files, SuperScript.ExternalFiles.MySql adds functionality necessary for storing the content of 
+	the files in a MySQL database.
+</p>
+
+<h3>What's In It?</h3>
+
+<p>
+  SuperScript.ExternalFile.MySql contains a single class, 
+  <abbr title="SuperScript.ExternalFile.MySql.MySqlStoreProvider"><code>MySqlStoreProvider</code></abbr>, which 
+  is an implementation of <abbr title="SuperScript.ExternalFile.Storage.IDbStoreProvider"><code>IDbStoreProvider</code></abbr>.
+</p>
+
+<p>
+  <abbr title="SuperScript.ExternalFile.MySql.MySqlStoreProvider"><code>MySqlStoreProvider</code></abbr> does not
+  add any members of its own: all members on this class are on the 
+  <abbr title="SuperScript.ExternalFile.Storage.IDbStoreProvider"><code>IDbStoreProvider</code></abbr> interface.
+</p>
+
+<pre class="brush: c#">
+	public class MySqlStoreProvider : IDbStoreProvider
+  	{
+	  	AddOrUpdate(IStorable storable);
+	  	string ConnectionString { get; set; }
+	  	string DbName { get; set; }
+	  	void Delete(string key);
+	  	void DeleteStore();
+	  	IStorable Get(string key);
+	  	IEnumerable&lt;IStorable&gt; GetAll();
+	  	void Init();
+	  	string StoreName { get; set; }
+  	}
+</pre>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tr>
+		<td colspan="3">
+			Inherited members
+		</td>
+	</tr>
+	<tr>
+	  <td>AddOrUpdate</td>
+	  <td>void</td>
+	  <td>
+	    <p>
+	      Adds the specified instance of <abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr> to the 
+	      store using the specified key. If an item exists with the specified <abbr title="SuperScript.ExternalFile.Storage.IStorable.Key"><code>Key</code></abbr> 
+	      then it will be updated.
+      </p>
+	  </td>
+	</tr>
+	<tr>
+		<td>ConnectionString</td>
+		<td>string</td>
+		<td>
+			<p>
+			  Gets or sets the connection string that will be used to communicate with the underlying database.
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>DbName</td>
+		<td>string</td>
+		<td>
+			<p>
+			  Gets or sets the name of the database, if this is not already detailed in the connection string.
+			</p>
+		</td>
+	</tr>
+	<tr>
+	  <td>Delete</td>
+	  <td>void</td>
+	  <td>
+	    <p>
+	      Deletes the instance of <abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr> which 
+	      has been stored against the specified <abbr title="SuperScript.ExternalFile.Storage.IStorable.Key"><code>Key</code></abbr>.
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+	  <td>DeleteStore</td>
+	  <td>void</td>
+	  <td>
+	    <p>
+	      Deletes the entire store from the database.
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Get</td>
+	  <td><abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr></td>
+	  <td>
+	    <p>
+	      Retrieves an <abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr> instance from 
+	      the database if an instance is found with the matching 
+	      <abbr title="SuperScript.ExternalFile.Storage.IStorable.Key"><code>Key</code></abbr>.
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+	  <td>GetAll</td>
+	  <td>IEnumerable&lt;<abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr>&gt;</td>
+	  <td>
+	    <p>
+	      Returns a snapshot of all <abbr title="SuperScript.ExternalFile.Storage.IStorable"><code>IStorable</code></abbr> instances in the store.
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+		<td>StoreName</td>
+		<td>string</td>
+		<td>
+			<p>
+			  Gets or sets the name of the table inside the database.
+			</p>
+		</td>
+	</tr>
+	<tr>
+	  <td>Init</td>
+	  <td>void</td>
+	  <td>
+	    <p>
+	      Checks that the store (a database table) exists. If not, the store will be created.
+	    </p>
+	  </td>
+	</tr>
+</table>
+
+<h3>Configuring SuperScript.ExternalFile.MySql</h3>
+
+<p>
+	SuperScript may be configured to store the contents of external files in Microsoft SQL Server declaratively in the 
+	config file or programmatically in code.
+</p>
+
+<p>
+	Declaring a store provider with an underlying database requires two steps:
+</p>
+
+<ul>
+	<li>
+		create an instance of <abbr title="SuperScript.ExternalFile.Storage.IDbStore"><code>IDbStore</code></abbr>. This
+		instructs SuperScript.ExternalFile that you wish to store the file contents in a database, though at this stage
+		SuperScript.ExternalFile has no knowledge of which type of database.
+	</li>
+	<li>
+		create an instance <abbr title="SuperScript.ExternalFile.Storage.IDbStoreProvider"><code>IDbStoreProvider</code></abbr> which 
+		instructs SuperScript.ExternalFile in which type of database - as well as the connection details - you wish to store the file
+		contents.
+	</li>
+</ul>
+
+<p>
+	The following example shows how Microsoft SQL Server may be declaratively configured as the store by referencing either
+	a connection string in place or an existing connection string.
+</p>
+
+<pre class="brush: xml">
+	&lt;configuration&gt;
+		&lt;configSections&gt;
+			&lt;section name="superScript" type="SuperScript.Configuration.SuperScriptConfig, SuperScript.Common" /&gt;
+			&lt;section name="superScript.ExternalFile" type="SuperScript.ExternalFile.Configuration.ExternalFileConfig, SuperScript.ExternalFile" /&gt;
+		&lt;/configSections&gt;
+		&hellip;
+		&lt;connectionStrings&gt;
+			&lt;add name="MyConnString" providerName="System.Data.SqlClient" connectionString="{YOUR CONNECTION STRING}" /&gt;
+		&lt;/connectionStrings&gt;
+		&hellip;
+		<!-- declaring a connection string in place -->
+		&lt;superScript.ExternalFile&gt;
+			&lt;storage type="SuperScript.ExternalFile.Storage.DbStore, SuperScript.ExternalFile"&gt;
+				&lt;dbProvider connectionString="{YOUR CONNECTION STRING}" type="SuperScript.ExternalFile.MySql.MySqlStoreProvider, SuperScript.ExternalFile.MySql" /&gt;
+			&lt;/storage&gt;
+		&lt;/superScript.ExternalFile&gt;
+		&#10;
+  		<!-- using an existing named connection string -->
+		&lt;superScript.ExternalFile&gt;
+			&lt;storage type="SuperScript.ExternalFile.Storage.DbStore, SuperScript.ExternalFile"&gt;
+				&lt;dbProvider connectionStringName="MyConnString" type="SuperScript.ExternalFile.MySql.MySqlStoreProvider, SuperScript.ExternalFile.MySql" /&gt;
+			&lt;/storage&gt;
+		&lt;/superScript.ExternalFile&gt;
+	&lt;/configuration&gt;
+</pre>
+
+<p>
+	Programmatically, the connection string must be declared (instead of specifying by name).
+</p>
+
+<pre class="brush: c#">
+	// create an instance of IDbStoreProvider for SQL Server
+	IDbStoreProvider dbStoreProvider = new SuperScript.ExternalFile.MySql.MySqlStoreProvider();
+	// allocate a connection string to the store provider 
+	dbStoreProvider.ConnectionString = ConfigurationManager.ConnectionStrings["MyConnString"].ToString();
+	
+	// create an instance of DbStore - an implementation of IDbStore
+	IDbStore dbStore = new DbStore();
+	// instruct the DbStore instance to use the above store provider
+	dbStore.DbStoreProvider = dbStoreProvider;
+	// all stores must be initialised
+	dbStore.Init();
+	
+	// finally, instruct SuperScript.ExternalFile to use the above store provider
+	SuperScript.ExternalFile.Configuration.Settings.Instance.StoreProvider = dbStore;
+</pre>
