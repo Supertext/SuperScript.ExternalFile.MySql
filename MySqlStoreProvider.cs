@@ -141,6 +141,7 @@ namespace SuperScript.ExternalFile.MySql
 											`contents` TEXT NOT NULL,
 											`contentType` VARCHAR(45) NOT NULL,
 											`longevity` INT NOT NULL DEFAULT 0,
+	                                        `created` DATETIME NOT NULL DEFAULT NOW(),
 											PRIMARY KEY (`key`));
 										SHOW TABLES LIKE '" + StoreName + "';";
 
@@ -412,6 +413,42 @@ namespace SuperScript.ExternalFile.MySql
 				throw new UnableToCreateStoreException();
 			}
 		}
+
+
+        /// <summary>
+        /// Removes instances of <see cref="IStorable"/> which are older than the specified <see cref="TimeSpan"/>.
+        /// </summary>
+        /// <param name="removeThreshold">Instances of <see cref="IStorable"/> which are older than this will be removed from the store.</param>
+        public void Scavenge(TimeSpan removeThreshold)
+        {
+            if (ConnectionString == null)
+            {
+                throw new MissingDatabaseConfigurationException("No matching connection string was found for the specified ConnectionStringName.");
+            }
+
+            // verify that we have a StoreName
+            if (String.IsNullOrWhiteSpace(StoreName))
+            {
+                throw new ConfigurablePropertyNotSpecifiedException("The StoreName property must be specified.");
+            }
+
+            using (var conn = new MySqlConnection(ConnectionString))
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = @"DELETE FROM `" + StoreName + @"`
+                                    WHERE `created` <= ?olderThan;";
+                cmd.Parameters.Add("?olderThan", MySqlDbType.DateTime).Value = DateTime.Now.Subtract(removeThreshold);
+
+                conn.Open();
+                if (!String.IsNullOrWhiteSpace(DbName))
+                {
+                    conn.ChangeDatabase(DbName);
+                }
+
+                cmd.ExecuteNonQuery();
+            }
+        }
 
 
 		/// <summary>
